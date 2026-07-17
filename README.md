@@ -120,7 +120,4 @@ Mulund College of Commerce (Autonomous), Mumbai
 Guide: Ms. Sandhya Pandey  
 Academic Year: 2025-26
 
-Tags
-machine-learning random-forest flask python leaflet.js 
-traffic-prediction smart-city sqlite web-app javascript 
-openstreetmap osrm nominatim chart.js
+
