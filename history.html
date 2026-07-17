@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TrafficIQ — Search History</title>
+  <link rel="stylesheet" href="theme.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .page-header h2 { font-family:var(--display);font-size:24px;font-weight:800;color:#1e293b; }
+.page-header p { font-size:13px;color:#64748b;margin-top:2px; }
+    .toolbar {
+      display: flex; gap: 10px; align-items: center;
+      margin-bottom: 20px; flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1; min-width: 200px;
+      padding: 10px 14px 10px 36px;
+      background: var(--panel);
+      border: 1px solid var(--border-dim);
+      border-radius: 9px; color: var(--text);
+      font-family: var(--body); font-size: 13px;
+      outline: none; transition: all 0.25s;
+      position: relative;
+    }
+    .search-input:focus { border-color: var(--green); }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap i { position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px; }
+
+    .filter-btn {
+      padding: 9px 14px;
+      background: var(--panel);
+      border: 1px solid var(--border-dim);
+      border-radius: 9px; color: var(--muted);
+      font-size: 12px; cursor: pointer;
+      transition: all 0.2s; font-family: var(--mono);
+    }
+    .filter-btn:hover, .filter-btn.active { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+
+    .clear-btn {
+      padding: 9px 14px;
+      background: transparent;
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 9px; color: var(--red);
+      font-size: 12px; cursor: pointer;
+      transition: all 0.2s; font-family: var(--mono);
+    }
+    .clear-btn:hover { background: rgba(239,68,68,0.1); }
+
+    /* History table */
+    .history-table-wrap { overflow-x: auto; }
+    .history-table {
+      width: 100%; border-collapse: collapse;
+    }
+    .history-table th {
+      text-align: left; padding: 12px 16px;
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--muted);
+      border-bottom: 1px solid var(--border-dim);
+      font-family: var(--mono); white-space: nowrap;
+    }
+    .history-table td {
+      padding: 14px 16px; font-size: 13px;
+      border-bottom: 1px solid var(--border-dim);
+      vertical-align: middle;
+    }
+    .history-table tr:last-child td { border-bottom: none; }
+    .history-table tbody tr { transition: background 0.15s; }
+    .history-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .route-arrow {
+      color: var(--muted); font-size: 11px; margin: 0 6px;
+    }
+
+    .action-btn {
+      padding: 5px 11px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--green); border-radius: 6px;
+      font-size: 11px; font-family: var(--mono);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .action-btn:hover { background: var(--green-glow); }
+
+    .del-btn {
+      padding: 5px 9px;
+      background: transparent;
+      border: 1px solid rgba(239,68,68,0.2);
+      color: var(--red); border-radius: 6px;
+      font-size: 11px; cursor: pointer;
+      transition: all 0.2s; margin-left: 5px;
+    }
+    .del-btn:hover { background: rgba(239,68,68,0.1); }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h3 { font-family: var(--display); font-size: 18px; color: var(--text); margin-bottom: 8px; }
+    .empty-state p { font-size: 13px; }
+
+    .pagination {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; margin-top: 24px;
+    }
+    .page-btn {
+      width: 34px; height: 34px;
+      background: var(--panel);
+      border: 1px solid var(--border-dim);
+      border-radius: 8px; color: var(--muted);
+      font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; font-family: var(--mono);
+    }
+    .page-btn:hover, .page-btn.active { border-color: var(--green); color: var(--green); background: var(--green-glow); }
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .result-count { font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<nav class="top-nav">
+  <a href="dashboard.html" class="nav-logo">
+    <div class="nav-logo-icon"><i class="fa-solid fa-satellite-dish" style="font-size:14px;color:white;"></i></div>
+    <span class="nav-logo-text">Traffic<span>IQ</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="dashboard.html" class="nav-link"><i class="fa-solid fa-map"></i> Dashboard</a>
+    <a href="analytics.html" class="nav-link"><i class="fa-solid fa-chart-bar"></i> Analytics</a>
+    <a href="history.html" class="nav-link active"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+    <a href="profile.html" class="nav-link"><i class="fa-solid fa-user"></i> Profile</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    <div class="nav-user">
+      <div class="nav-avatar" id="navAvatar">G</div>
+      <span id="navUsername">Guest</span>
+    </div>
+    <a href="index.html" class="logout-btn" onclick="logout()">LOGOUT</a>
+  </div>
+</nav>
+
+<div class="page-content">
+  <div class="page-header">
+    <div>
+      <h2>Search History</h2>
+      <p>All routes you have analyzed</p>
+    </div>
+    <button class="clear-btn" onclick="clearAll()">
+      <i class="fa-solid fa-trash"></i> CLEAR ALL
+    </button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input class="search-input form-input" type="text" id="searchBox" placeholder="Search routes..." oninput="filterHistory()"/>
+    </div>
+    <button class="filter-btn active" id="fAll"    onclick="setFilter('all')">All</button>
+    <button class="filter-btn"        id="fHigh"   onclick="setFilter('High')">🔴 High</button>
+    <button class="filter-btn"        id="fMedium" onclick="setFilter('Medium')">🟡 Medium</button>
+    <button class="filter-btn"        id="fLow"    onclick="setFilter('Low')">🟢 Low</button>
+  </div>
+
+  <div class="result-count" id="resultCount" style="margin-bottom:12px;"></div>
+
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div class="history-table-wrap">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Congestion</th>
+            <th>ETA</th>
+            <th>Distance</th>
+            <th>Date & Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+      <div id="emptyState" style="display:none;">
+        <div class="empty-state">
+          <div class="empty-icon">🗺️</div>
+          <h3>No history yet</h3>
+          <p>Search your first route on the dashboard — it will appear here!</p>
+          <a href="dashboard.html" class="btn-primary" style="display:inline-flex;margin-top:16px;">
+            <i class="fa-solid fa-map"></i> Go to Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const username = localStorage.getItem('username') || 'Guest';
+document.getElementById('navAvatar').textContent = username[0].toUpperCase();
+document.getElementById('navUsername').textContent = username;
+
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  document.getElementById('themeBtn').textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
+function logout() { localStorage.clear(); }
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+let allHistory = JSON.parse(localStorage.getItem('trafficiq_history') || '[]');
+let filtered = [...allHistory];
+let currentFilter = 'all';
+let currentPage = 1;
+const PER_PAGE = 10;
+
+function setFilter(f) {
+  currentFilter = f;
+  ['All','High','Medium','Low'].forEach(x => {
+    const el = document.getElementById('f' + x);
+    if (el) el.classList.toggle('active', (f === 'all' && x === 'All') || f === x);
+  });
+  currentPage = 1;
+  filterHistory();
+}
+
+function filterHistory() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  filtered = allHistory.filter(h => {
+    const matchFilter = currentFilter === 'all' || h.congestion === currentFilter;
+    const matchSearch = !q || h.src.toLowerCase().includes(q) || h.dest.toLowerCase().includes(q);
+    return matchFilter && matchSearch;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('historyBody');
+  const empty = document.getElementById('emptyState');
+  const count = document.getElementById('resultCount');
+
+  count.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  const start = (currentPage - 1) * PER_PAGE;
+  const page = filtered.slice(start, start + PER_PAGE);
+
+  tbody.innerHTML = page.map((h, i) => {
+    const num = start + i + 1;
+    const cClass = h.congestion === 'High' ? 'high' : h.congestion === 'Medium' ? 'medium' : 'low';
+    return `
+      <tr>
+        <td style="color:var(--muted);font-family:var(--mono);font-size:11px;">${num}</td>
+        <td><strong>${h.src}</strong></td>
+        <td>${h.dest}</td>
+        <td><span class="badge badge-${cClass}">${h.congestion || '—'}</span></td>
+        <td style="font-family:var(--mono);font-size:12px;">${h.eta || '—'}</td>
+        <td style="font-family:var(--mono);font-size:12px;">${h.dist || '—'}</td>
+        <td style="color:var(--muted);font-size:11px;">${h.datetime || h.date || '—'}</td>
+        <td>
+          <button class="action-btn" onclick="reuse('${h.src}','${h.dest}')">REUSE</button>
+          <button class="del-btn" onclick="deleteEntry(${allHistory.indexOf(h)})"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  renderPagination();
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PER_PAGE);
+  const pg = document.getElementById('pagination');
+  if (total <= 1) { pg.innerHTML = ''; return; }
+
+  let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for (let i = 1; i <= total; i++) {
+    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(p) {
+  const total = Math.ceil(filtered.length / PER_PAGE);
+  if (p < 1 || p > total) return;
+  currentPage = p;
+  renderTable();
+}
+
+function reuse(src, dest) {
+  localStorage.setItem('prefill_src', src);
+  localStorage.setItem('prefill_dest', dest);
+  window.location.href = 'dashboard.html';
+}
+
+function deleteEntry(index) {
+  allHistory.splice(index, 1);
+  localStorage.setItem('trafficiq_history', JSON.stringify(allHistory));
+  filtered = [...allHistory];
+  filterHistory();
+  toast('🗑 Entry removed');
+}
+
+function clearAll() {
+  if (!allHistory.length) return toast('Nothing to clear.');
+  if (confirm('Clear all search history? This cannot be undone.')) {
+    allHistory = [];
+    filtered = [];
+    localStorage.setItem('trafficiq_history', JSON.stringify([]));
+    renderTable();
+    toast('✓ History cleared');
+  }
+}
+
+renderTable();
+</script>
+</body>
+</html>

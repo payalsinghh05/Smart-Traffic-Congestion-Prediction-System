@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TrafficIQ — Profile</title>
+  <link rel="stylesheet" href="theme.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    body { overflow-x: hidden; }
+
+    .profile-hero {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(59,130,246,0.06));
+      border-bottom: 1px solid var(--border);
+      padding: 40px 0 32px;
+      position: relative; z-index: 1;
+    }
+
+    .profile-hero-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; gap: 28px;
+    }
+
+    .avatar-big {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 28px; font-weight: 700;
+      color: var(--darker); flex-shrink: 0;
+      box-shadow: 0 0 30px rgba(0,255,136,0.25);
+    }
+
+    .profile-info h2 {
+      font-family: var(--display);
+      font-size: 26px; font-weight: 800;
+      color: #1e293b;
+    }
+
+    .profile-info p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+    .profile-badges {
+      display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+    }
+
+    .profile-badge {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--border-dim);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: 11px; color: var(--muted);
+    }
+    .profile-badge i { color: var(--green); }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px; margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--border-dim);
+      border-radius: 14px; padding: 20px;
+      text-align: center;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .stat-card:hover { border-color: var(--border); transform: translateY(-2px); }
+
+    .stat-icon { font-size: 22px; margin-bottom: 8px; }
+
+    /* Favorites table */
+    .fav-table { width: 100%; border-collapse: collapse; }
+    .fav-table th {
+      text-align: left; padding: 10px 14px;
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--muted);
+      border-bottom: 1px solid var(--border-dim);
+      font-family: var(--mono);
+    }
+    .fav-table td {
+      padding: 12px 14px; font-size: 13px;
+      border-bottom: 1px solid var(--border-dim);
+      vertical-align: middle;
+    }
+    .fav-table tr:last-child td { border-bottom: none; }
+    .fav-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .use-btn {
+      padding: 5px 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--green); border-radius: 6px;
+      font-size: 11px; font-family: var(--mono);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .use-btn:hover { background: var(--green-glow); }
+
+    .del-btn {
+      padding: 5px 10px;
+      background: transparent;
+      border: 1px solid rgba(239,68,68,0.2);
+      color: var(--red); border-radius: 6px;
+      font-size: 11px; cursor: pointer;
+      transition: all 0.2s; margin-left: 6px;
+    }
+    .del-btn:hover { background: rgba(239,68,68,0.1); }
+
+    /* Change password */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .section-head {
+      font-family: var(--display);
+      font-size: 17px; font-weight: 700;
+      color: var(--text); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-head i { color: var(--green); font-size: 15px; }
+
+    .empty-msg {
+      text-align: center; padding: 32px;
+      color: var(--muted); font-size: 13px;
+    }
+    .empty-msg i { font-size: 28px; display: block; margin-bottom: 8px; }
+
+    @media (max-width: 768px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .profile-hero-inner { flex-direction: column; text-align: center; }
+      .profile-badges { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav class="top-nav">
+  <a href="dashboard.html" class="nav-logo">
+    <div class="nav-logo-icon"><i class="fa-solid fa-satellite-dish" style="font-size:14px;color:white;"></i></div>
+    <span class="nav-logo-text">Traffic<span>IQ</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="dashboard.html" class="nav-link"><i class="fa-solid fa-map"></i> Dashboard</a>
+    <a href="analytics.html" class="nav-link"><i class="fa-solid fa-chart-bar"></i> Analytics</a>
+    <a href="history.html" class="nav-link"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+    <a href="profile.html" class="nav-link active"><i class="fa-solid fa-user"></i> Profile</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    <div class="nav-user">
+      <div class="nav-avatar" id="navAvatar">G</div>
+      <span id="navUsername">Guest</span>
+    </div>
+    <a href="index.html" class="logout-btn" onclick="logout()">LOGOUT</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="profile-hero">
+  <div class="profile-hero-inner">
+    <div class="avatar-big" id="bigAvatar">G</div>
+    <div class="profile-info">
+      <h2 id="profileName">Guest User</h2>
+      <p id="profileSince">Member since —</p>
+      <div class="profile-badges">
+        <div class="profile-badge"><i class="fa-solid fa-shield-halved"></i> Verified User</div>
+        <div class="profile-badge"><i class="fa-solid fa-route"></i> <span id="routeCount">0</span> Routes Searched</div>
+        <div class="profile-badge"><i class="fa-solid fa-star"></i> <span id="favCount">0</span> Saved Routes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="page-content">
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">🗺️</div>
+      <div class="stat-num" id="s-routes">0</div>
+      <div class="stat-label">Routes Searched</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-num" id="s-favs">0</div>
+      <div class="stat-label">Saved Favorites</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔴</div>
+      <div class="stat-num" id="s-high">0</div>
+      <div class="stat-label">High Traffic Seen</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🟢</div>
+      <div class="stat-num" id="s-low">0</div>
+      <div class="stat-label">Clear Roads Found</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- Saved Routes -->
+    <div class="card">
+      <div class="section-head"><i class="fa-solid fa-star"></i> Saved Routes</div>
+      <div id="favContainer">
+        <div class="empty-msg"><i class="fa-regular fa-bookmark"></i>No saved routes yet.<br>Search a route on the dashboard and save it!</div>
+      </div>
+    </div>
+
+    <!-- Change Password -->
+    <div>
+      <div class="card" style="margin-bottom:20px;">
+        <div class="section-head"><i class="fa-solid fa-key"></i> Change Password</div>
+        <div class="input-group" style="margin-bottom:12px;">
+          <label class="form-label">Current Password</label>
+          <input class="form-input" type="password" id="curPass" placeholder="Enter current password"/>
+        </div>
+        <div class="input-group" style="margin-bottom:12px;">
+          <label class="form-label">New Password</label>
+          <input class="form-input" type="password" id="newPass" placeholder="Enter new password"/>
+        </div>
+        <div class="input-group" style="margin-bottom:16px;">
+          <label class="form-label">Confirm New Password</label>
+          <input class="form-input" type="password" id="conPass" placeholder="Confirm new password"/>
+        </div>
+        <button class="btn-primary" onclick="changePassword()" style="width:100%;">
+          <i class="fa-solid fa-lock"></i> UPDATE PASSWORD
+        </button>
+        <div id="pwdMsg" style="margin-top:10px;font-size:13px;text-align:center;"></div>
+      </div>
+
+      <!-- Account Info -->
+      <div class="card">
+        <div class="section-head"><i class="fa-solid fa-circle-info"></i> Account Info</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-dim);">
+            <span style="font-size:13px;color:var(--muted);">Username</span>
+            <span style="font-size:13px;font-weight:600;" id="infoUsername">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-dim);">
+            <span style="font-size:13px;color:var(--muted);">Account Type</span>
+            <span style="font-size:13px;" id="infoType">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 0;">
+            <span style="font-size:13px;color:var(--muted);">Last Login</span>
+            <span style="font-size:13px;" id="infoLastLogin">—</span>
+          </div>
+        </div>
+        <button class="btn-outline" onclick="confirmDelete()" style="width:100%;margin-top:16px;border-color:rgba(239,68,68,0.3);color:var(--red);">
+          <i class="fa-solid fa-trash"></i> Delete Account
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Auth
+const userId = localStorage.getItem('user_id');
+const username = localStorage.getItem('username') || 'Guest';
+if (!userId) { /* guest mode ok */ }
+
+// Theme
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  document.getElementById('themeBtn').textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
+  localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+}
+if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light'); document.getElementById('themeBtn').textContent = '☀️'; }
+
+function logout() { localStorage.clear(); }
+
+// Toast
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// Init profile
+function initProfile() {
+  document.getElementById('navAvatar').textContent = username[0].toUpperCase();
+  document.getElementById('bigAvatar').textContent = username[0].toUpperCase();
+  document.getElementById('navUsername').textContent = username;
+  document.getElementById('profileName').textContent = userId ? username : 'Guest User';
+  document.getElementById('infoUsername').textContent = username;
+  document.getElementById('infoType').textContent = userId ? '🟢 Registered' : '👤 Guest';
+  document.getElementById('infoLastLogin').textContent = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  // Load stats from localStorage
+  const history = JSON.parse(localStorage.getItem('trafficiq_history') || '[]');
+  const favs = JSON.parse(localStorage.getItem('trafficiq_favorites') || '[]');
+  const highCount = history.filter(h => h.congestion === 'High').length;
+  const lowCount = history.filter(h => h.congestion === 'Low').length;
+
+  document.getElementById('s-routes').textContent = history.length;
+  document.getElementById('s-favs').textContent = favs.length;
+  document.getElementById('s-high').textContent = highCount;
+  document.getElementById('s-low').textContent = lowCount;
+  document.getElementById('routeCount').textContent = history.length;
+  document.getElementById('favCount').textContent = favs.length;
+  document.getElementById('profileSince').textContent = 'Active user · ' + new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+  renderFavorites(favs);
+}
+
+function renderFavorites(favs) {
+  const container = document.getElementById('favContainer');
+  if (!favs.length) {
+    container.innerHTML = '<div class="empty-msg"><i class="fa-regular fa-bookmark"></i>No saved routes yet.<br>Search a route on the dashboard and save it!</div>';
+    return;
+  }
+  container.innerHTML = `
+    <table class="fav-table">
+      <thead><tr><th>#</th><th>From</th><th>To</th><th>Saved</th><th>Action</th></tr></thead>
+      <tbody>
+        ${favs.map((f, i) => `
+          <tr>
+            <td style="color:var(--muted);">${i + 1}</td>
+            <td>${f.src}</td>
+            <td>${f.dest}</td>
+            <td style="color:var(--muted);font-size:11px;">${f.date}</td>
+            <td>
+              <button class="use-btn" onclick="useRoute('${f.src}','${f.dest}')">USE</button>
+              <button class="del-btn" onclick="deleteFav(${i})"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function useRoute(src, dest) {
+  localStorage.setItem('prefill_src', src);
+  localStorage.setItem('prefill_dest', dest);
+  window.location.href = 'dashboard.html';
+  toast('Route loaded!');
+}
+
+function deleteFav(index) {
+  const favs = JSON.parse(localStorage.getItem('trafficiq_favorites') || '[]');
+  favs.splice(index, 1);
+  localStorage.setItem('trafficiq_favorites', JSON.stringify(favs));
+  renderFavorites(favs);
+  document.getElementById('s-favs').textContent = favs.length;
+  document.getElementById('favCount').textContent = favs.length;
+  toast('🗑 Route removed from favorites');
+}
+
+async function changePassword() {
+  const cur = document.getElementById('curPass').value.trim();
+  const nw = document.getElementById('newPass').value.trim();
+  const con = document.getElementById('conPass').value.trim();
+  const msgEl = document.getElementById('pwdMsg');
+
+  if (!cur || !nw || !con) { msgEl.style.color = 'var(--red)'; msgEl.textContent = 'Please fill all fields.'; return; }
+  if (nw !== con) { msgEl.style.color = 'var(--red)'; msgEl.textContent = 'New passwords do not match.'; return; }
+  if (nw.length < 4) { msgEl.style.color = 'var(--red)'; msgEl.textContent = 'Password must be at least 4 characters.'; return; }
+
+  try {
+    const res = await fetch('http://127.0.0.1:5000/change_password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, old_password: cur, new_password: nw })
+    });
+    const data = await res.json();
+    msgEl.style.color = res.ok ? 'var(--green)' : 'var(--red)';
+    msgEl.textContent = data.message;
+  } catch {
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = '⚠ Backend offline.';
+  }
+}
+
+function confirmDelete() {
+  if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
+    toast('Account deletion requires backend support. Contact admin.');
+  }
+}
+
+initProfile();
+</script>
+</body>
+</html>
