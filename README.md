@@ -62,7 +62,7 @@ trafficiq/
 1. Clone the repository
 ```bash
    git clone https://github.com/payalsinghh05/Smart-Traffic-Congestion-Prediction-System.git
-   cd trafficiq
+   cd Smart-Traffic-Congestion-Prediction-System
 ```
 
 2. Install Python dependencies
